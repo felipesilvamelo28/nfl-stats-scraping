@@ -1,10 +1,15 @@
+import time
 from decimal import Decimal
 import logging
+import requests
 
 from django.http import JsonResponse
 from rest_framework import viewsets
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+
+from rest_framework.renderers import JSONRenderer
+
 
 from .serializer import *
 from scrapping.models import *
@@ -118,7 +123,7 @@ def get_passing_players(url):
 
             logger.info("salvando player: " + player_temp.name)
             #time.sleep(1/2)
-            player_temp.save()
+            #player_temp.save()
 
 
 def get_rushing_players(url):
@@ -221,14 +226,19 @@ def get_fumbles_players(url):
             player_temp = Fumbles()
             player_temp.year = 2020
             player_temp.name = player[0]
-            player_temp.ff = Decimal(player[1])
-            player_temp.fr = Decimal(player[2])
-            player_temp.fr_td = Decimal(player[3])
+            player_temp.ff = player[1]
+            player_temp.fr = player[2]
+            player_temp.fr_td = player[3]
 
             logger.info("salvando player: " + player_temp.name)
-            #time.sleep(1/2)
-            player_temp.save()
-
+            time.sleep(1)
+            #player_temp.save()
+            serializer = FumblesSerializer(player_temp)
+            content = JSONRenderer().render(serializer.data)
+            payload = content.decode("utf-8")
+            print(payload)
+            headers = {'content-type': 'application/json'}
+            r = requests.post("http://localhost:8080/fumble", data=payload, headers = headers)
 
 def get_tackles_players(url):
     urls = get_urls(url)
@@ -266,11 +276,11 @@ def get_tackles_players(url):
 def import_data(request):
     if request.method == 'GET':
 
-        get_passing_players(passing_url)
-        get_rushing_players(rushing_url)
-        get_receiving_players(receiving_url)
+        #get_passing_players(passing_url)
+        #get_rushing_players(rushing_url)
+        #get_receiving_players(receiving_url)
         get_fumbles_players(fumbles_url)
-        get_tackles_players(tackles_url)
+        #get_tackles_players(tackles_url)
 
         return JsonResponse({"status": "import ok"})
 

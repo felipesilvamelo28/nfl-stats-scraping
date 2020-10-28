@@ -62,11 +62,11 @@ class Receiving(models.Model):
 
 
 class Fumbles(models.Model):
-    year = models.DecimalField(max_digits=10, decimal_places=5)
+    year = models.CharField(max_length=30)
     name = models.CharField(max_length=30)
-    ff = models.DecimalField(max_digits=10, decimal_places=5)
-    fr = models.DecimalField(max_digits=10, decimal_places=5)
-    fr_td = models.DecimalField(max_digits=10, decimal_places=5)
+    ff = models.CharField(max_length=30)
+    fr = models.CharField(max_length=30)
+    fr_td = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name
